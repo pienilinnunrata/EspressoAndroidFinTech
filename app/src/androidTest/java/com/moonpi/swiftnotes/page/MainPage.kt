@@ -6,7 +6,11 @@ import android.support.test.espresso.action.ViewActions.longClick
 import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.*
+import android.support.test.uiautomator.By
+import android.support.test.uiautomator.Until
 import com.moonpi.swiftnotes.R
+import com.moonpi.swiftnotes.element.DropDownListView
+import com.moonpi.swiftnotes.util.device
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.endsWith
 import ru.tinkoff.allure.android.deviceScreenshot
@@ -14,14 +18,17 @@ import ru.tinkoff.allure.step
 
 class MainPage {
 
+    private val toolbarMoreActionSelector = By.descContains("Ещё")
+
     fun tapNewNote(block: NewNote.() -> Unit) = step("Открываем создание новой заметки") {
         onView(withId(R.id.newNote)).perform(click())
         deviceScreenshot("tap_new_note")
         NewNote { block() }
     }
 
-    fun tapMoreBtn() = step("Открываем менюшку по кнопке Еще") {
-        // TODO
+    fun tapMoreBtn(block: DropDownListView.() -> Unit) = step("Открываем менюшку по кнопке Еще") {
+        device.wait(Until.findObject(toolbarMoreActionSelector), 1).click()
+        DropDownListView { block() }
         deviceScreenshot("tap_more_btn")
     }
 
@@ -44,7 +51,8 @@ class MainPage {
                     allOf(
                             withParent(withId(R.id.toolbarMain)),
                             isDisplayed(),
-                            withClassName(endsWith("TextView")))
+                            withClassName(endsWith("TextView"))
+                    )
             ).check(matches(withText("Swiftnotes")))
             deviceScreenshot("main_page_opened")
         }
@@ -58,14 +66,6 @@ class MainPage {
         fun noteNotShown(title: String) = step("Проверяем, что заметка не отображается") {
             onView((allOf(withId(R.id.titleView), withText(title)))).check(doesNotExist())
             deviceScreenshot("note_not_shown")
-        }
-
-        fun btnWithTextOnMenuDisplayed(text: String, index: Int) {
-            onView(allOf(withParent(allOf(
-                    withId(R.id.content),
-                    withParentIndex(index))
-            ), withId(R.id.title))).check(matches(withText(text)))
-            deviceScreenshot("check_btn_on_menu")
         }
     }
 

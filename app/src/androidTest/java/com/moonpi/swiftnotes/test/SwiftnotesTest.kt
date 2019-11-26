@@ -1,10 +1,10 @@
 package com.moonpi.swiftnotes.test
 
+import android.support.test.espresso.Espresso.pressBack
 import android.support.test.runner.AndroidJUnit4
 import com.moonpi.swiftnotes.MainActivity
 import com.moonpi.swiftnotes.page.MainPage
 import com.moonpi.swiftnotes.rule.SwiftnotesRule
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -15,12 +15,7 @@ import ru.tinkoff.allure.annotations.DisplayName
 class SwiftnotesTest : AbstractSwiftnotesTest() {
 
     @get:Rule
-    val rule = SwiftnotesRule(MainActivity::class.java, false)
-
-    @Before
-    fun setupForCreatePageTests() {
-        rule.launchActivity()
-    }
+    val rule = SwiftnotesRule(MainActivity::class.java, true)
 
     @Test
     @DisplayName("Проверка экрана создания заметки")
@@ -67,19 +62,28 @@ class SwiftnotesTest : AbstractSwiftnotesTest() {
         }
     }
 
-//    TODO
-//    @Test
-//    @DisplayName("Проверка пунктов меню в тулбаре")
-//    fun toolbarMenu() {
-//        MainPage {
-//            tapMoreBtn()
-//            assert {
-//                btnWithTextOnMenuDisplayed("Backup notes", 0)
-//                btnWithTextOnMenuDisplayed("Restore notes", 1)
-//                btnWithTextOnMenuDisplayed("Rate app", 2)
-//            }
-//        }
-//    }
+    @Test
+    @DisplayName("Проверка пунктов меню в тулбаре")
+    fun toolbarMenu() {
+        MainPage {
+            tapMoreBtn {
+                assert {
+                    buttonShownWithText("Backup notes")
+                    buttonShownWithText("Restore notes")
+                    buttonShownWithText("Rate app")
+                }
+                pressBack()
+            }
+            tapNewNote {
+                tapMoreBtn {
+                    assert {
+                        buttonShownWithText("Note font size")
+                        buttonShownWithText("Hide note body in list")
+                    }
+                }
+            }
+        }
+    }
 
     @Test
     @DisplayName("Проверка удаления заметки")

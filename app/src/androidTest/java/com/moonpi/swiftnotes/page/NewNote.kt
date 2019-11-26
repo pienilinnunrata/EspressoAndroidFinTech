@@ -1,22 +1,34 @@
 package com.moonpi.swiftnotes.page
 
 import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.Espresso.pressBack
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.action.ViewActions.typeText
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.*
+import android.support.test.uiautomator.By
+import android.support.test.uiautomator.Until
+import android.widget.ImageButton
 import com.moonpi.swiftnotes.R
+import com.moonpi.swiftnotes.element.DropDownListView
+import com.moonpi.swiftnotes.util.device
 import org.hamcrest.CoreMatchers.allOf
 import ru.tinkoff.allure.android.deviceScreenshot
 import ru.tinkoff.allure.step
 
 class NewNote {
 
-    fun tapBack() = step("Тапаем назад, пока не появится попап сохранения") { // well, it works!
-        pressBack()
-        pressBack()
+    private val toolbarCancelActionSelector = By.clazz(ImageButton::class.java)
+    private val toolbarMoreActionSelector = By.descContains("Ещё")
+
+    fun tapBack() = step("Тапаем назад, пока не появится попап сохранения") {
+        device.wait(Until.findObject(toolbarCancelActionSelector), 1).click()
         deviceScreenshot("tap_back")
+    }
+
+    fun tapMoreBtn(block: DropDownListView.() -> Unit) = step("Открываем менюшку по кнопке Еще") {
+        device.wait(Until.findObject(toolbarMoreActionSelector), 1).click()
+        DropDownListView { block() }
+        deviceScreenshot("tap_more_btn")
     }
 
     fun tapNoToSave() = step("Тапаем NO на попапе сохранения") {
